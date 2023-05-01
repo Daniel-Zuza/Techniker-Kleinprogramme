@@ -5,8 +5,6 @@ from datetime import timedelta
 import pandas as pd
 from ics import Calendar, Event
 
-from parameter import LERNEINHEIT_WIEDERHOLUNGSPLAN
-
 class Kalenderverwalter():
     def __init__(self, thema, zeitkapatzitaeten):
         self.thema = thema
@@ -102,13 +100,13 @@ class Kalenderverwalter():
             if self.tageskapatzitaeten[datum] - timedelta(hours=self.thema.lerneinheit_zeitaufwand) >= timedelta(0)
         ]
 
-    def neueLerneinheitenErrechnen(self, freie_termine, lerneinheit_wiederholungsplan):
+    def neueLerneinheitenErrechnen(self, freie_termine):
         self.lerneinheitstermine = []
         lerneinheiten = []
-        for le in lerneinheit_wiederholungsplan:
+        for le in self.thema.wiederholungsplan:
             if int(le) < int(self.thema.aktuelle_lerneinheit): continue
 
-            termin = self.lerneinheitsTerminErhalten(le, lerneinheit_wiederholungsplan, freie_termine)
+            termin = self.lerneinheitsTerminErhalten(le, freie_termine)
             self.lerneinheitstermine.append(termin)
 
             lerneinheiten.append(
@@ -121,26 +119,31 @@ class Kalenderverwalter():
 
         return lerneinheiten
 
-    def lerneinheitsTerminErhalten(self, lerneinheit, wiederhoungsplan, freie_termine):
+    def lerneinheitsTerminErhalten(self, lerneinheit, freie_termine):
         if len(self.lerneinheitstermine) == 0:
             solltermin = freie_termine[0]
         else:
             voheriger_termin = self.lerneinheitstermine[-1]
-            solltermin = voheriger_termin + timedelta(wiederhoungsplan[lerneinheit])
+            solltermin = voheriger_termin + timedelta(self.thema.wiederholungsplan[lerneinheit])
 
-        if (solltermin in freie_termine or solltermin > self.letzttermin) and solltermin not in self.lerneinheitstermine:
+        offset_null = self.thema.ersttermin_offset == 0
+        termin_platz = solltermin in freie_termine or solltermin > self.letzttermin
+        termin_unverwendet = solltermin not in self.lerneinheitstermine
+
+        if offset_null and termin_platz and termin_unverwendet:
             return solltermin
 
         else:
             for freier_termin in freie_termine:
-                termindifferenz = freier_termin - solltermin
-                voziehungstoleranz = timedelta(int(wiederhoungsplan[lerneinheit] / 3))
+                if freier_termin >= dt.datetime.now().date() + timedelta(self.thema.ersttermin_offset):
+                    termindifferenz = freier_termin - solltermin
+                    voziehungstoleranz = timedelta(int(self.thema.wiederholungsplan[lerneinheit] / 3))
 
-                if termindifferenz > timedelta(0) or abs(termindifferenz) <= voziehungstoleranz:
-                    moeglicher_termin = solltermin + (freier_termin - solltermin)
+                    if termindifferenz > timedelta(0) or abs(termindifferenz) <= voziehungstoleranz:
+                        moeglicher_termin = solltermin + (freier_termin - solltermin)
 
-                    if not moeglicher_termin in self.lerneinheitstermine:
-                        return moeglicher_termin
+                        if not moeglicher_termin in self.lerneinheitstermine:
+                            return moeglicher_termin
 
         exit('KEIN TERMIN GEFUNDEN -- ABBRUCH')
 
@@ -153,7 +156,7 @@ class Kalenderverwalter():
         #     print(t)
         # print()
 
-        lernheiten = self.neueLerneinheitenErrechnen(freie_termine, LERNEINHEIT_WIEDERHOLUNGSPLAN)
+        lernheiten = self.neueLerneinheitenErrechnen(freie_termine)
         for event in lernheiten: self.kalender_neu.events.add(event)
 
     def neuenKalenderSpeichern(self):
