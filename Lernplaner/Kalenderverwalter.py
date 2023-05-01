@@ -8,17 +8,30 @@ from ics import Calendar, Event
 from parameter import LERNEINHEIT_WIEDERHOLUNGSPLAN
 
 class Kalenderverwalter():
-    def __init__(self, zeitkapatzitaeten):
+    def __init__(self, thema, zeitkapatzitaeten):
+        self.thema = thema
         self.kalender_neu = Calendar()
         self.zeitkapatzitaeten = zeitkapatzitaeten
 
         if os.path.exists("kalender.ics"):
-            kalender_alt = Calendar(open('kalender.ics', 'r').read())
-            if os.path.exists("kalender_backup.ics"): os.remove('kalender_backup.ics')
+            self.kalender_alt = Calendar(open('kalender.ics', 'r').read())
+            self.kalender_neu = self.kalender_alt
+            if os.path.exists("kalender.ics"): os.remove('kalender.ics')
             with open('kalender_backup.ics', 'w') as my_file:
-                my_file.writelines(kalender_alt.serialize_iter())
-            self.plan = self.planErhalten(kalender_alt)
-            self.alle_termine = self.alleTermineErhalten(kalender_alt)
+                my_file.writelines(self.kalender_alt.serialize_iter())
+            self.plan = self.planErhalten(self.kalender_alt)
+            self.alle_termine = self.alleTermineErhalten(self.kalender_alt)
+            self.tageskapatzitaeten = self.tageskapatzitaetenErhalten()
+
+            # print('Alle vorherigen Termine:')
+            # for t in sorted(self.alle_termine):
+            #     print(t)
+            # print()
+            #
+            # print('Alle Tageskapatzitaeten:')
+            # for t in self.tageskapatzitaeten:
+            #     print(t)
+            # print()
 
     def planErhalten(self, kalender_alt):
         return [
@@ -31,27 +44,95 @@ class Kalenderverwalter():
             ]
 
     def alleTermineErhalten(self, kalender_alt):
+        self.ersttermin = min([e['begin'] for e in self.plan if e['begin'] > dt.datetime.now()]).date()
+        self.letzttermin = max([e['begin'] for e in self.plan if e['begin'] > dt.datetime.now()]).date()
+
         return [
-            pd.to_datetime(str(e.begin)).tz_localize(None)
+            (pd.to_datetime(str(e.begin)).tz_localize(None)).date()
             for e in kalender_alt.events
         ]
 
-    def freieTermineErhalten(self):
-        ersttermin = min([e['begin'] for e in self.plan if e['begin'] > dt.datetime.now()])
-        letzttermin = max([e['begin'] for e in self.plan if e['begin'] > dt.datetime.now()])
+    def tageskapatzitaetenErhalten(self):
+        tageskapatzitaeten = {}
+        for tages_plus in range((self.letzttermin - self.ersttermin).days + 1):
+            datum = self.ersttermin + timedelta(tages_plus)
+            tageskapatzitaeten[datum] = timedelta(hours=self.zeitkapatzitaeten[datum.weekday()])
 
-        return [ersttermin + timedelta(tages_plus)
-                         for tages_plus in range((letzttermin - ersttermin).days)
-                         if not ersttermin + timedelta(tages_plus) in self.alle_termine]
+        for event in self.plan:
+            datum = event['begin'].date()
+            zeitaufwand = event['end'] - event['begin']
+            tageskapatzitaeten[datum] -= zeitaufwand
+
+        return tageskapatzitaeten
+
+    def tagesTermineAnzahlErhalten(self):
+        termin_anzahlen = {}
+        for datum in self.alle_termine:
+            if not datum in termin_anzahlen: termin_anzahlen[datum] = 1
+            else: termin_anzahlen[datum] += 1
+        return termin_anzahlen
+
+    def freieTermineErhalten(self):
+        return [
+            datum
+            for datum in self.tageskapatzitaeten
+            if self.tageskapatzitaeten[datum] - timedelta(hours=self.thema.lerneinheit_zeitaufwand) >= timedelta(0)
+        ]
 
     def neueLerneinheitenErrechnen(self, freie_termine, lerneinheit_wiederholungsplan):
-        pass
+        self.lerneinheitstermine = []
+        lerneinheiten = []
+        for le in lerneinheit_wiederholungsplan:
+            termin = self.lerneinheitsTerminErhalten(le, lerneinheit_wiederholungsplan, freie_termine)
+            self.lerneinheitstermine.append(termin)
 
-    def lerneinheitenEinplanen(self, thema, bisheriger_lernplan):
-        freie_termine = self.freieTermineErhalten(thema)
-        thema_lerneinheiten = self.neueLerneinheitenErrechnen(freie_termine, LERNEINHEIT_WIEDERHOLUNGSPLAN)
-        # lerneinheiten für neues thema einplanen basierend auf freien plätzen
+            lerneinheiten.append(
+                Event(
+                    name=f'{self.thema.name} - {le}',
+                    begin=termin,
+                    end=pd.to_datetime(termin) + timedelta(hours=self.thema.lerneinheit_zeitaufwand)
+                )
+            )
 
+        return lerneinheiten
 
+    def lerneinheitsTerminErhalten(self, lerneinheit, wiederhoungsplan, freie_termine):
+        if len(self.lerneinheitstermine) == 0:
+            solltermin = freie_termine[0]
+        else:
+            voheriger_termin = self.lerneinheitstermine[-1]
+            solltermin = voheriger_termin + timedelta(wiederhoungsplan[lerneinheit])
+
+        if (solltermin in freie_termine or solltermin > self.letzttermin) and solltermin not in self.lerneinheitstermine:
+            return solltermin
+
+        else:
+            for freier_termin in freie_termine:
+                termindifferenz = freier_termin - solltermin
+                voziehungstoleranz = timedelta(int(wiederhoungsplan[lerneinheit] / 3))
+
+                if termindifferenz > timedelta(0) or abs(termindifferenz) <= voziehungstoleranz:
+                    moeglicher_termin = solltermin + (freier_termin - solltermin)
+
+                    if not moeglicher_termin in self.lerneinheitstermine:
+                        return moeglicher_termin
+
+        exit('KEIN TERMIN GEFUNDEN -- ABBRUCH')
+
+    def lerneinheitenEinplanen(self):
+        freie_termine = self.freieTermineErhalten()
+        if freie_termine == []: freie_termine = [self.letzttermin + timedelta(1)]
+
+        # print('Freie Termine:')
+        # for t in sorted(freie_termine):
+        #     print(t)
+        # print()
+
+        lernheiten = self.neueLerneinheitenErrechnen(freie_termine, LERNEINHEIT_WIEDERHOLUNGSPLAN)
+        for event in lernheiten: self.kalender_neu.events.add(event)
+
+    def neuenKalenderSpeichern(self):
+        with open('kalender.ics', 'w') as my_file:
+            my_file.writelines(self.kalender_neu.serialize_iter())
 
 
