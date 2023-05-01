@@ -11,22 +11,40 @@ ZEITKAPATZITAETEN = {
     6: 6,
 }
 
+# LERNEINHEIT_WIEDERHOLUNGSPLAN = {
+#     '1': 1,
+#     '2': 1,
+#     '3': 2,
+#     '4': 2,
+#     '5': 3,
+#     '6': 3,
+#     '7': 4,
+#     '8': 4,
+#     '9': 7,
+#     '10': 7,
+#     '11': 15,
+#     '12': 15,
+#     '13': 15,
+#     '14': 15,
+#     '15': 15,
+# }
+
 LERNEINHEIT_WIEDERHOLUNGSPLAN = {
-    '1': 1,
-    '2': 1,
-    '3': 2,
-    '4': 2,
-    '5': 3,
-    '6': 3,
-    '7': 4,
-    '8': 4,
+    '1': 7,
+    '2': 9,
+    '3': 7,
+    '4': 9,
+    '5': 7,
+    '6': 9,
+    '7': 7,
+    '8': 9,
     '9': 7,
-    '10': 7,
-    '11': 15,
-    '12': 15,
-    '13': 15,
-    '14': 15,
-    '15': 15,
+    '10': 9,
+    '11': 7,
+    '12': 9,
+    '13': 7,
+    '14': 9,
+    '15': 7,
 }
 
 class Thema():
@@ -36,4 +54,5 @@ class Thema():
         self.prioritaet = prioritaet
         self.lerneinheit_zeitaufwand = lerneinheit_zeitaufwand
         self.erfassungsdatum = erfassungsdatum
+
 

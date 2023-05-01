@@ -8,7 +8,7 @@ def testDatei():
     if os.path.exists("kalender.ics"):
         kalender_alt = Calendar(open('kalender.ics', 'r').read())
         if os.path.exists("kalender.ics"): os.remove('kalender.ics')
-        with open('kalender_backup.ics', 'w') as my_file: my_file.writelines(kalender_alt.serialize_iter())
+        with open('kalender.ics', 'w') as my_file: my_file.writelines(kalender_alt.serialize_iter())
     kalender_neu = Calendar()
 
 

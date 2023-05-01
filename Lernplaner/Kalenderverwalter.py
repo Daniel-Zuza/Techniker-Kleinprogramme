@@ -17,12 +17,20 @@ class Kalenderverwalter():
             self.kalender_alt = Calendar(open('kalender.ics', 'r').read())
             self.kalender_neu = self.kalender_alt
             if os.path.exists("kalender.ics"): os.remove('kalender.ics')
-            with open('kalender_backup.ics', 'w') as my_file:
+
+            backup_name = str(dt.datetime.now()).replace(':', '%').replace('.', '%')
+            with open(f'Kalender-Backups/kalender_backup_{backup_name}.ics', 'w') as my_file:
                 my_file.writelines(self.kalender_alt.serialize_iter())
+
             self.plan = self.planErhalten(self.kalender_alt)
             self.alle_termine = self.alleTermineErhalten(self.kalender_alt)
             self.tageskapatzitaeten = self.tageskapatzitaetenErhalten()
 
+            # print('Plan:')
+            # for t in self.plan:
+            #     print(t)
+            # print()
+            #
             # print('Alle vorherigen Termine:')
             # for t in sorted(self.alle_termine):
             #     print(t)
@@ -32,6 +40,20 @@ class Kalenderverwalter():
             # for t in self.tageskapatzitaeten:
             #     print(t)
             # print()
+
+        else:
+            self.verwaltungsparaterAufStartwerteSetzen()
+
+    def verwaltungsparaterAufStartwerteSetzen(self):
+        self.ersttermin = dt.datetime.now().date() - timedelta(1)
+        self.letzttermin = dt.datetime.now().date() - timedelta(1)
+        self.alle_termine = []
+
+        self.tageskapatzitaeten = {
+            dt.datetime.now().date(): timedelta(hours=self.zeitkapatzitaeten[dt.datetime.now().weekday()])
+        }
+
+
 
     def planErhalten(self, kalender_alt):
         return [
@@ -44,8 +66,9 @@ class Kalenderverwalter():
             ]
 
     def alleTermineErhalten(self, kalender_alt):
-        self.ersttermin = min([e['begin'] for e in self.plan if e['begin'] > dt.datetime.now()]).date()
-        self.letzttermin = max([e['begin'] for e in self.plan if e['begin'] > dt.datetime.now()]).date()
+        self.ersttermin = min([e['begin'] for e in self.plan if e['begin'].date() >= dt.datetime.now().date()]).date()
+        self.letzttermin = max([e['begin'] for e in self.plan if e['begin'].date() >= dt.datetime.now().date()]).date()
+
 
         return [
             (pd.to_datetime(str(e.begin)).tz_localize(None)).date()
@@ -54,7 +77,7 @@ class Kalenderverwalter():
 
     def tageskapatzitaetenErhalten(self):
         tageskapatzitaeten = {}
-        for tages_plus in range((self.letzttermin - self.ersttermin).days + 1):
+        for tages_plus in range(0, (self.letzttermin - self.ersttermin).days + 1):
             datum = self.ersttermin + timedelta(tages_plus)
             tageskapatzitaeten[datum] = timedelta(hours=self.zeitkapatzitaeten[datum.weekday()])
 
@@ -83,6 +106,8 @@ class Kalenderverwalter():
         self.lerneinheitstermine = []
         lerneinheiten = []
         for le in lerneinheit_wiederholungsplan:
+            if int(le) < int(self.thema.aktuelle_lerneinheit): continue
+
             termin = self.lerneinheitsTerminErhalten(le, lerneinheit_wiederholungsplan, freie_termine)
             self.lerneinheitstermine.append(termin)
 
