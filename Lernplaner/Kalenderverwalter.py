@@ -18,7 +18,7 @@ class Kalenderverwalter():
 
             backup_name = str(dt.datetime.now()).replace(':', '%').replace('.', '%')
             with open(f'Kalender-Backups/kalender_backup_{backup_name}.ics', 'w') as my_file:
-                my_file.writelines(self.kalender_alt.serialize_iter())
+               my_file.writelines(self.kalender_alt.serialize_iter())
 
             self.plan = self.planErhalten(self.kalender_alt)
             self.alle_termine = self.alleTermineErhalten(self.kalender_alt)
@@ -36,7 +36,7 @@ class Kalenderverwalter():
             #
             # print('Alle Tageskapatzitaeten:')
             # for t in self.tageskapatzitaeten:
-            #     print(t)
+            #     print(t, self.tageskapatzitaeten[t])
             # print()
 
         else:
@@ -75,14 +75,18 @@ class Kalenderverwalter():
 
     def tageskapatzitaetenErhalten(self):
         tageskapatzitaeten = {}
+        # print('self.letzttermin', self.letzttermin)
+        # print('self.ersttermin', self.ersttermin)
+
         for tages_plus in range(0, (self.letzttermin - self.ersttermin).days + 1):
             datum = self.ersttermin + timedelta(tages_plus)
             tageskapatzitaeten[datum] = timedelta(hours=self.zeitkapatzitaeten[datum.weekday()])
 
         for event in self.plan:
             datum = event['begin'].date()
-            zeitaufwand = event['end'] - event['begin']
-            tageskapatzitaeten[datum] -= zeitaufwand
+            if datum > dt.datetime.now().date():
+                zeitaufwand = event['end'] - event['begin']
+                tageskapatzitaeten[datum] -= zeitaufwand
 
         return tageskapatzitaeten
 
@@ -120,6 +124,8 @@ class Kalenderverwalter():
         return lerneinheiten
 
     def lerneinheitsTerminErhalten(self, lerneinheit, freie_termine):
+        # print('lerneinheit, freie_termine', lerneinheit, freie_termine)
+
         if len(self.lerneinheitstermine) == 0:
             solltermin = freie_termine[0]
         else:
@@ -133,7 +139,11 @@ class Kalenderverwalter():
         if offset_null and termin_platz and termin_unverwendet:
             return solltermin
 
+
         else:
+            if solltermin > self.letzttermin and solltermin not in self.lerneinheitstermine:
+                return solltermin
+
             for freier_termin in freie_termine:
                 if freier_termin >= dt.datetime.now().date() + timedelta(self.thema.ersttermin_offset):
                     termindifferenz = freier_termin - solltermin
