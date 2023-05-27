@@ -3,21 +3,11 @@ from Thema import Thema
 from parameter import *
 from Kalenderverwalter import Kalenderverwalter
 
-LERNEINHEIT_WIEDERHOLUNGSPLAN = LERNEINHEITS_WIEDERHOLUNGSVARITATIONEN[0]
-
-# themen = [
-#     Thema('WSK/3/1', LERNEINHEIT_WIEDERHOLUNGSPLAN, '3', 0.5),
-#     Thema('WSK/3/2 und 4', LERNEINHEIT_WIEDERHOLUNGSPLAN, '3', 0.5),
-#     Thema('WSK/3/3', LERNEINHEIT_WIEDERHOLUNGSPLAN, '3', 0.5),
-#     Thema('WSK/2', LERNEINHEIT_WIEDERHOLUNGSPLAN, '7', 0.5),
-#     Thema('WSK/1', LERNEINHEIT_WIEDERHOLUNGSPLAN, '7', 0.5),
-# ]
+LERNEINHEIT_WIEDERHOLUNGSPLAN = LERNEINHEITS_WIEDERHOLUNGSVARITATIONEN[2]
 
 themen = [
-    Thema('WSK/4/2', LERNEINHEIT_WIEDERHOLUNGSPLAN, '4', 0.5, ersttermin_offset=0),
-    Thema('WSK/4/3', LERNEINHEIT_WIEDERHOLUNGSPLAN, '1', 0.5, ersttermin_offset=2),
-    Thema('WSK/4/5', LERNEINHEIT_WIEDERHOLUNGSPLAN, '1', 0.5, ersttermin_offset=4),
-    Thema('WSK/4/6', LERNEINHEIT_WIEDERHOLUNGSPLAN, '1', 0.5, ersttermin_offset=6),
+    Thema('M5/1 - Basis', LERNEINHEIT_WIEDERHOLUNGSPLAN, '1', 0.25, ersttermin_offset=9),
+    Thema('M5/3 - Basis', LERNEINHEIT_WIEDERHOLUNGSPLAN, '1', 0.25, ersttermin_offset=9),
 ]
 
 for thema in themen:
