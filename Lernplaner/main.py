@@ -3,11 +3,25 @@ from Thema import Thema
 from parameter import *
 from Kalenderverwalter import Kalenderverwalter
 
-LERNEINHEIT_WIEDERHOLUNGSPLAN = LERNEINHEITS_WIEDERHOLUNGSVARITATIONEN[2]
 
 themen = [
-    Thema('M5/1 - Basis', LERNEINHEIT_WIEDERHOLUNGSPLAN, '1', 0.25, ersttermin_offset=9),
-    Thema('M5/3 - Basis', LERNEINHEIT_WIEDERHOLUNGSPLAN, '1', 0.25, ersttermin_offset=9),
+    Thema('WSK/1', WIEDERHOLUNGSVARITATIONEN['Langzeiterinnerung'], '1', 0.5, ersttermin_offset=6),
+    Thema('WSK/2', WIEDERHOLUNGSVARITATIONEN['Langzeiterinnerung'], '1', 0.5, ersttermin_offset=6),
+    Thema('WSK/3', WIEDERHOLUNGSVARITATIONEN['Langzeiterinnerung'], '1', 1, ersttermin_offset=7),
+    Thema('WSK/4', WIEDERHOLUNGSVARITATIONEN['Langzeiterinnerung'], '1', 1, ersttermin_offset=7),
+
+    Thema('M4/1 - Basis', WIEDERHOLUNGSVARITATIONEN['Basiseinpraegung'], '1', 0.25, ersttermin_offset=1),
+    Thema('M4/3 - Basis', WIEDERHOLUNGSVARITATIONEN['Basiseinpraegung'], '1', 0.25, ersttermin_offset=1),
+    Thema('M5/1 - Basis', WIEDERHOLUNGSVARITATIONEN['Basiseinpraegung'], '1', 0.25, ersttermin_offset=8),
+    Thema('M5/3 - Basis', WIEDERHOLUNGSVARITATIONEN['Basiseinpraegung'], '1', 0.25, ersttermin_offset=8),
+
+    Thema('M4/1', WIEDERHOLUNGSVARITATIONEN['Aufbaueinpraegung'], '1', 0.5, ersttermin_offset=1),
+    Thema('M4/2', WIEDERHOLUNGSVARITATIONEN['Aufbaueinpraegung'], '1', 0.5, ersttermin_offset=1),
+    Thema('M4/3', WIEDERHOLUNGSVARITATIONEN['Aufbaueinpraegung'], '1', 0.5, ersttermin_offset=1),
+    Thema('M5/1', WIEDERHOLUNGSVARITATIONEN['Aufbaueinpraegung'], '1', 0.5, ersttermin_offset=8),
+    Thema('M5/2', WIEDERHOLUNGSVARITATIONEN['Aufbaueinpraegung'], '1', 0.5, ersttermin_offset=8),
+    Thema('M5/3', WIEDERHOLUNGSVARITATIONEN['Aufbaueinpraegung'], '1', 0.5, ersttermin_offset=8),
+
 ]
 
 for thema in themen:
