@@ -4,16 +4,18 @@ import datetime as dt
 from datetime import timedelta
 import pandas as pd
 from ics import Calendar, Event
+from KalenderAnzeiger import KalenderTag, differenzverhaeltnisseAnzeigen
 
 class Kalenderverwalter():
-    def __init__(self, thema, zeitkapatzitaeten):
+    def __init__(self, startkalender_name, thema, zeitkapatzitaeten):
         self.thema = thema
         self.kalender_neu = Calendar()
         self.zeitkapatzitaeten = zeitkapatzitaeten
 
-        if os.path.exists("kalender.ics"):
-            self.kalender_alt = Calendar(open('kalender.ics', 'r').read())
+        if os.path.exists(startkalender_name):
+            self.kalender_alt = Calendar(open(startkalender_name, 'r').read())
             self.kalender_neu = self.kalender_alt
+
             if os.path.exists("kalender.ics"): os.remove('kalender.ics')
 
             backup_name = str(dt.datetime.now()).replace(':', '%').replace('.', '%')
@@ -51,14 +53,13 @@ class Kalenderverwalter():
             dt.datetime.now().date(): timedelta(hours=self.zeitkapatzitaeten[dt.datetime.now().weekday()])
         }
 
-
-
     def planErhalten(self, kalender_alt):
         return [
             {
                 'name': e.name,
                 'begin': pd.to_datetime(str(e.begin)).tz_localize(None),
-                'end': pd.to_datetime(str(e.end)).tz_localize(None)
+                'end': pd.to_datetime(str(e.end)).tz_localize(None),
+                'status': e.status
             }
             for e in kalender_alt.events
             ]
@@ -139,7 +140,6 @@ class Kalenderverwalter():
         if offset_null and termin_platz and termin_unverwendet:
             return solltermin
 
-
         else:
             if solltermin > self.letzttermin and solltermin not in self.lerneinheitstermine:
                 return solltermin
@@ -169,8 +169,61 @@ class Kalenderverwalter():
         lernheiten = self.neueLerneinheitenErrechnen(freie_termine)
         for event in lernheiten: self.kalender_neu.events.add(event)
 
+    def vergangendeTermineWeglassen(self):
+        vergangene_events = [e for e in self.kalender_neu.events if e.begin.date() < dt.datetime.now().date()]
+        for event in vergangene_events:
+            self.kalender_neu.events.remove(event)
+
     def neuenKalenderSpeichern(self):
+        self.vergangendeTermineWeglassen()
         with open('kalender.ics', 'w') as my_file:
             my_file.writelines(self.kalender_neu.serialize_iter())
+
+    def kalenderInfosAnzeigen(self):
+        plan = self.planErhalten(self.kalender_neu)
+        plan = self.tagessortiertenPlanErhalten(plan)
+
+        print('Kalendertermine:')
+        for datum in plan:
+            tag = KalenderTag(datum)
+
+            for t in plan[datum]:
+                tag.eventHinzufuegen(t['begin'], t['name'], self.thema.wiederholungsplan)
+
+            tag.anzeigen()
+
+        print('Differenzverhältnisse:')
+        differenzen = self.istLerneinheitsdifferenzenErhalten(plan)
+        differenzverhaeltnisseAnzeigen(self.thema.wiederholungsplan, differenzen, toleranz=0.1)
+
+    def istLerneinheitsdifferenzenErhalten(self, plan):
+        differenzen = {}
+        letzter_termin = None
+
+        for datum in plan:
+            for event in plan[datum]:
+                if self.thema.name in event['name']:
+
+                    if letzter_termin == None:
+                        differenzen[event['name']] = int(self.thema.aktuelle_lerneinheit)
+                        letzter_termin = datum
+
+                    else:
+                        differenzen[event['name']] = (datum - letzter_termin).days
+                        letzter_termin = datum
+
+        return differenzen
+
+    def tagessortiertenPlanErhalten(self, plan):
+        neuer_plan = {}
+
+        for event in plan:
+
+            if not event['begin'] in neuer_plan:
+                neuer_plan[event['begin']] = [event]
+            else:
+                neuer_plan[event['begin']].append(event)
+
+        return dict(sorted(neuer_plan.items()))
 
 

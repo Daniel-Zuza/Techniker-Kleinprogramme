@@ -1,12 +1,12 @@
 
 ZEITKAPATZITAETEN = {
-    0: 0.5,
-    1: 0.5,
-    2: 0.5,
-    3: 0.5,
+    0: 1.5,
+    1: 1.5,
+    2: 1.5,
+    3: 1.5,
     4: 1,
-    5: 2,
-    6: 2,
+    5: 1,
+    6: 1,
 }
 
 WIEDERHOLUNGSVARITATIONEN = {
@@ -20,8 +20,6 @@ WIEDERHOLUNGSVARITATIONEN = {
         '6': 7,
         '7': 7,
         '8': 15,
-        '9': 15,
-        '10': 15,
     },
     'Wohennah':
     {
