@@ -7,10 +7,18 @@ from ics import Calendar, Event
 from KalenderAnzeiger import KalenderTag, differenzverhaeltnisseAnzeigen
 
 class Kalenderverwalter():
-    def __init__(self, startkalender_name, thema, zeitkapatzitaeten):
+    def __init__(self, startkalender_name, thema, zeitkapatzitaeten, anzeigemodus=False):
         self.thema = thema
         self.kalender_neu = Calendar()
         self.zeitkapatzitaeten = zeitkapatzitaeten
+
+        if anzeigemodus:
+            if os.path.exists(startkalender_name):
+                plan = self.planErhalten(Calendar(open(startkalender_name, 'r').read()))
+                plan = self.tagessortiertenPlanErhalten(plan)
+                self.kalenderTermineAnzeigen(plan)
+
+            exit()
 
         if os.path.exists(startkalender_name):
             self.kalender_alt = Calendar(open(startkalender_name, 'r').read())
@@ -85,7 +93,7 @@ class Kalenderverwalter():
 
         for event in self.plan:
             datum = event['begin'].date()
-            if datum > dt.datetime.now().date():
+            if datum >= dt.datetime.now().date():
                 zeitaufwand = event['end'] - event['begin']
                 tageskapatzitaeten[datum] -= zeitaufwand
 
@@ -179,10 +187,22 @@ class Kalenderverwalter():
         with open('kalender.ics', 'w') as my_file:
             my_file.writelines(self.kalender_neu.serialize_iter())
 
-    def kalenderInfosAnzeigen(self):
-        plan = self.planErhalten(self.kalender_neu)
+    def kalenderInfosAnzeigen(self, kalender):
+        plan = self.planErhalten(kalender)
         plan = self.tagessortiertenPlanErhalten(plan)
 
+        self.kalenderTermineAnzeigen(plan)
+        self.differenzverhaeltnisseAnzeigen(plan)
+
+    def differenzverhaeltnisseAnzeigen(self, plan=None, kalender=None):
+        if plan is None:
+            plan = self.planErhalten(kalender)
+            plan = self.tagessortiertenPlanErhalten(plan)
+
+        differenzen = self.istLerneinheitsdifferenzenErhalten(plan)
+        differenzverhaeltnisseAnzeigen(self.thema.wiederholungsplan, differenzen, toleranz=0.1)
+
+    def kalenderTermineAnzeigen(self, plan):
         print('Kalendertermine:')
         for datum in plan:
             tag = KalenderTag(datum)
@@ -192,9 +212,6 @@ class Kalenderverwalter():
 
             tag.anzeigen()
 
-        print('Differenzverhältnisse:')
-        differenzen = self.istLerneinheitsdifferenzenErhalten(plan)
-        differenzverhaeltnisseAnzeigen(self.thema.wiederholungsplan, differenzen, toleranz=0.1)
 
     def istLerneinheitsdifferenzenErhalten(self, plan):
         differenzen = {}
@@ -205,7 +222,7 @@ class Kalenderverwalter():
                 if self.thema.name in event['name']:
 
                     if letzter_termin == None:
-                        differenzen[event['name']] = int(self.thema.aktuelle_lerneinheit)
+                        differenzen[event['name']] = int(self.thema.wiederholungsplan[self.thema.aktuelle_lerneinheit])
                         letzter_termin = datum
 
                     else:

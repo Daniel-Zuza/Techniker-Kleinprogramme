@@ -21,7 +21,7 @@ WIEDERHOLUNGSVARITATIONEN = {
         '7': 7,
         '8': 15,
     },
-    'Wohennah':
+    'Wochennah':
     {
         '1': 7,
         '2': 9,
