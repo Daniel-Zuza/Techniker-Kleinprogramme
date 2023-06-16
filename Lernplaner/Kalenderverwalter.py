@@ -24,8 +24,6 @@ class Kalenderverwalter():
             self.kalender_alt = Calendar(open(startkalender_name, 'r').read())
             self.kalender_neu = self.kalender_alt
 
-            if os.path.exists("kalender.ics"): os.remove('kalender.ics')
-
             backup_name = str(dt.datetime.now()).replace(':', '%').replace('.', '%')
             with open(f'Kalender-Backups/kalender_backup_{backup_name}.ics', 'w') as my_file:
                my_file.writelines(self.kalender_alt.serialize_iter())
@@ -186,6 +184,9 @@ class Kalenderverwalter():
         self.vergangendeTermineWeglassen()
         with open('kalender.ics', 'w') as my_file:
             my_file.writelines(self.kalender_neu.serialize_iter())
+
+    def altenKalendeLoeschen(self):
+        if os.path.exists("kalender.ics"): os.remove('kalender.ics')
 
     def kalenderInfosAnzeigen(self, kalender):
         plan = self.planErhalten(kalender)
