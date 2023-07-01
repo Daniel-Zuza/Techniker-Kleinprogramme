@@ -6,7 +6,7 @@ from Kalenderverwalter import Kalenderverwalter
 startkalender = 'kalender.ics'
 
 themen = [
-    Thema('BT4/Std', WIEDERHOLUNGSVARITATIONEN['Auswendig-Neuerfassung'], '1', 0.5, ersttermin_offset=0),
+    Thema('M7', WIEDERHOLUNGSVARITATIONEN['Konzept-Neuerfassung'], '1', 0.5, ersttermin_offset=0),
 ]
 
 for thema in themen:
