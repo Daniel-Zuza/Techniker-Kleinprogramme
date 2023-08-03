@@ -6,7 +6,22 @@ from Kalenderverwalter import Kalenderverwalter
 startkalender = 'kalender.ics'
 
 themen = [
-    Thema('M7', WIEDERHOLUNGSVARITATIONEN['Konzept-Neuerfassung'], '1', 0.5, ersttermin_offset=0),
+    Thema('M4/1', WIEDERHOLUNGSVARITATIONEN['Aufbaueinpraegung'], '3', 0.5, ersttermin_offset=1),
+    Thema('M4/2', WIEDERHOLUNGSVARITATIONEN['Aufbaueinpraegung'], '3', 0.5, ersttermin_offset=1),
+    Thema('M4/3', WIEDERHOLUNGSVARITATIONEN['Aufbaueinpraegung'], '3', 0.5, ersttermin_offset=1),
+
+    Thema('M5/1', WIEDERHOLUNGSVARITATIONEN['Aufbaueinpraegung'], '3', 0.5, ersttermin_offset=1),
+    Thema('M5/2', WIEDERHOLUNGSVARITATIONEN['Aufbaueinpraegung'], '3', 0.5, ersttermin_offset=1),
+    Thema('M5/3', WIEDERHOLUNGSVARITATIONEN['Aufbaueinpraegung'], '3', 0.5, ersttermin_offset=1),
+
+    Thema('M6/1', WIEDERHOLUNGSVARITATIONEN['Aufbaueinpraegung'], '2', 0.5, ersttermin_offset=1),
+    Thema('M6/2', WIEDERHOLUNGSVARITATIONEN['Aufbaueinpraegung'], '2', 0.5, ersttermin_offset=1),
+
+    Thema('M7/1', WIEDERHOLUNGSVARITATIONEN['Aufbaueinpraegung'], '2', 0.5, ersttermin_offset=7),
+
+    Thema('M8/1', WIEDERHOLUNGSVARITATIONEN['Aufbaueinpraegung'], '1', 0.5, ersttermin_offset=7),
+    Thema('M8/2', WIEDERHOLUNGSVARITATIONEN['Aufbaueinpraegung'], '1', 0.5, ersttermin_offset=7),
+
 ]
 
 for thema in themen:

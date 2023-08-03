@@ -4,20 +4,31 @@
 #     1: 1.5,
 #     2: 1.5,
 #     3: 1.5,
-#     4: 1,
-#     5: 1,
+#     4: 2,
+#     5: 4,
 #     6: 1,
 # }
 
+# ZEITKAPATZITAETEN = {
+#     0: 0.5,
+#     1: 0.5,
+#     2: 0.5,
+#     3: 0.5,
+#     4: 1,
+#     5: 2,
+#     6: 0,
+# }
+
 ZEITKAPATZITAETEN = {
-    0: 0.5,
-    1: 0.5,
-    2: 0.5,
-    3: 0.5,
+    0: 1,
+    1: 1,
+    2: 1,
+    3: 1,
     4: 1,
-    5: 2,
-    6: 0,
+    5: 3,
+    6: 3,
 }
+
 
 WIEDERHOLUNGSVARITATIONEN = {
     'Auswendig-Neuerfassung':
@@ -68,6 +79,15 @@ WIEDERHOLUNGSVARITATIONEN = {
         '5': 6,
         '6': 9,
     },
+    'Halb-Woechentlich':
+        {
+            '1': 4,
+            '2': 3,
+            '3': 4,
+            '4': 3,
+            '5': 4,
+            '6': 3,
+        },
     'Langzeiterinnerung':
     {
         '1': 14,

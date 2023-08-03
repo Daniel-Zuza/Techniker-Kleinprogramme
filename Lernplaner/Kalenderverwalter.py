@@ -24,9 +24,10 @@ class Kalenderverwalter():
             self.kalender_alt = Calendar(open(startkalender_name, 'r').read())
             self.kalender_neu = self.kalender_alt
 
-            backup_name = str(dt.datetime.now()).replace(':', '%').replace('.', '%')
-            with open(f'Kalender-Backups/kalender_backup_{backup_name}.ics', 'w') as my_file:
-               my_file.writelines(self.kalender_alt.serialize_iter())
+            # backup erstellen
+            # backup_name = str(dt.datetime.now()).replace(':', '%').replace('.', '%')
+            # with open(f'Kalender-Backups/kalender_backup_{backup_name}.ics', 'w') as my_file:
+            #    my_file.writelines(self.kalender_alt.serialize_iter())
 
             self.plan = self.planErhalten(self.kalender_alt)
             self.alle_termine = self.alleTermineErhalten(self.kalender_alt)
@@ -220,7 +221,7 @@ class Kalenderverwalter():
 
         for datum in plan:
             for event in plan[datum]:
-                if self.thema.name in event['name']:
+                if f'{self.thema.name} ' in event['name']:
 
                     if letzter_termin == None:
                         differenzen[event['name']] = int(self.thema.wiederholungsplan[self.thema.aktuelle_lerneinheit])
