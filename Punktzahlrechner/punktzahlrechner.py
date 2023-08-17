@@ -35,11 +35,11 @@ def punkteErrechnen(clippwert):
             themen_mittelwerte = []
             themen_letztsession_mittelwerte = []
             themenbereich = ''
+            lines = file.readlines()
 
+            for line in lines:
 
-            for line in file:
-
-                if '/' in line:
+                if '/' in line or line is lines[-1]:
                     if themenbereich != '':
                         themenmittelwert = gewichtetenThemenmittelwertErrechnen(themen_punkte, clippwert)
 
@@ -58,12 +58,15 @@ def punkteErrechnen(clippwert):
                         #print(f'Session Punktzahl: {ref_session_punktzahl}')
                         #resultate.write(f'Session Punktzahl: {ref_session_punktzahl}\n')
                         themen_punkte.append(session_punkte)
+
                         session_punkte = []
 
                 else:
                     for punkt in line.strip().split(', '):
                         if not '-' in punkt:
                             session_punkte.append(int(punkt))
+
+
 
             if not len(themen_punkte) == 0:
                 print(f'Themen Punktzahl von {themenbereich}: {gewichtetenThemenmittelwertErrechnen(themen_punkte, clippwert)}\n')
@@ -75,8 +78,11 @@ def punkteErrechnen(clippwert):
                 print(f'themenübergreifende Letztsession Punktzahl: {sum(themen_letztsession_mittelwerte) / len(themen_letztsession_mittelwerte)}')
                 resultate.write(f'themenübergreifende Letztsession Punktzahl: {sum(themen_letztsession_mittelwerte) / len(themen_letztsession_mittelwerte)}\n')
 
+                print('themen_letztsession_mittelwerte', themen_letztsession_mittelwerte)
+
 # gewichtet
 punkteErrechnen(clippwert=0.25)
+
 
 # ungewichtet
 #punkteErrechnen(clippwert=1)
