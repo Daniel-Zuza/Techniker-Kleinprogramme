@@ -5,7 +5,9 @@ def gewichtetenThemenmittelwertErrechnen(themen_punkte, clippwert):
     # Gewichtungen errechnen basierend darauf wie aktuell eine Lernsession ist
     # und dann alte Lernsessions auf Durchschnittswerte setzen und laenge der Session je nach Gewichtung kürzen
 
-    if len(themen_punkte) < 2:  # sicherstellen, dass mind. 2 Lernsession vorhanden sind
+    print('themen_punkte', themen_punkte)
+
+    if len(themen_punkte) < 2:  # sicherstellen, dass mind. 2 Lernsession vorhanden sind um weiter zu machen
 
         return sum(themen_punkte[0]) / len(themen_punkte[0])
 
@@ -23,6 +25,15 @@ def gewichtetenThemenmittelwertErrechnen(themen_punkte, clippwert):
 
     return sum(gewichtete_themenpunkte) / len(gewichtete_themenpunkte)
 
+def Themenabschlussberechnungen():
+    pass
+
+def b():
+    pass
+
+def c():
+    pass
+
 def punkteErrechnen(clippwert):
     if os.path.exists('resultate.txt'):
         os.remove('resultate.txt')
@@ -37,9 +48,30 @@ def punkteErrechnen(clippwert):
             themenbereich = ''
             lines = file.readlines()
 
-            for line in lines:
+            for i, line in enumerate(lines):
 
-                if '/' in line or line is lines[-1]:
+                if line is lines[-1]:
+                    if len(session_punkte) != 0:
+                        ref_session_punktzahl = sum(session_punkte) / len(session_punkte)
+                        #print(f'Session Punktzahl: {ref_session_punktzahl}')
+                        #resultate.write(f'Session Punktzahl: {ref_session_punktzahl}\n')
+                        themen_punkte.append(session_punkte)
+
+                        session_punkte = []
+
+                        themenmittelwert = gewichtetenThemenmittelwertErrechnen(themen_punkte, clippwert)
+
+                        themen_mittelwerte.append(themenmittelwert)
+                        themen_letztsession_mittelwerte.append(ref_session_punktzahl)
+                        print(f'Themen Punktzahl von {themenbereich}: {themenmittelwert}\n')
+                        resultate.write(f'Themen Punktzahl von {themenbereich}: {themenmittelwert}\n')
+
+                        themen_punkte = []
+
+                    themenbereich = ' '.join(line.strip().split(' ')[1:])
+
+                elif '/' in line:
+                    print('line', line, i)
                     if themenbereich != '':
                         themenmittelwert = gewichtetenThemenmittelwertErrechnen(themen_punkte, clippwert)
 
@@ -53,6 +85,7 @@ def punkteErrechnen(clippwert):
                     themenbereich = ' '.join(line.strip().split(' ')[1:])
 
                 elif '#' in line:
+                    print(i)
                     if len(session_punkte) != 0:
                         ref_session_punktzahl = sum(session_punkte) / len(session_punkte)
                         #print(f'Session Punktzahl: {ref_session_punktzahl}')
